@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Click-Through Carousel</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+
+  .carousel {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #111;
+  }
+
+  .slides {
+    display: flex;
+    height: 100%;
+    transition: transform 0.4s ease;
+  }
+
+  .slide {
+    min-width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 600;
+  }
+
+  .slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-btn:hover { background: rgba(0,0,0,0.8); }
+  .prev { left: 12px; }
+  .next { right: 12px; }
+
+  .dots {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+  }
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+  }
+  .dot.active { background: #fff; }
+</style>
+</head>
+<body>
+
+<div class="carousel">
+  <div class="slides" id="slides">
+    <div class="slide" style="background:#3b5bdb;">Project One</div>
+    <div class="slide" style="background:#2f9e44;">Project Two</div>
+    <div class="slide" style="background:#e8590c;">Project Three</div>
+    <div class="slide" style="background:#9c36b5;">Project Four</div>
+  </div>
+
+  <button class="nav-btn prev" onclick="move(-1)">&#10094;</button>
+  <button class="nav-btn next" onclick="move(1)">&#10095;</button>
+
+  <div class="dots" id="dots"></div>
+</div>
+
+<script>
+  const slidesEl = document.getElementById('slides');
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  let index = 0;
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goTo(i);
+    dotsEl.appendChild(dot);
+  });
+  const dots = document.querySelectorAll('.dot');
+
+  function update() {
+    slidesEl.style.transform = `translateX(-${index * 100}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === index));
+  }
+
+  function move(dir) {
+    index = (index + dir + slides.length) % slides.length;
+    update();
+  }
+
+  function goTo(i) {
+    index = i;
+    update();
+  }
+</script>
+
+</body>
+</html>
