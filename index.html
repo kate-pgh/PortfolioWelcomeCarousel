@@ -13,12 +13,17 @@
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+    padding: 20px 0;
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 900px;
   }
 
   .carousel {
     position: relative;
     width: 100%;
-    max-width: 900px;
     aspect-ratio: 16 / 9;
     overflow: hidden;
     border-radius: 8px;
@@ -84,28 +89,77 @@
     cursor: pointer;
   }
   .dot.active { background: #fff; }
+
+  /* Thumbnail strip */
+  .thumbs {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .thumb {
+    flex: 0 0 auto;
+    width: 90px;
+    aspect-ratio: 16 / 9;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, border-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .thumb:hover {
+    opacity: 0.85;
+  }
+
+  .thumb.active {
+    opacity: 1;
+    border-color: #fff;
+  }
 </style>
 </head>
 <body>
 
-<div class="carousel">
-  <div class="slides" id="slides">
-    <div class="slide" style="background:#3b5bdb;">Project One</div>
-    <div class="slide" style="background:#2f9e44;">Project Two</div>
-    <div class="slide" style="background:#e8590c;">Project Three</div>
-    <div class="slide" style="background:#9c36b5;">Project Four</div>
+<div class="wrapper">
+  <div class="carousel">
+    <div class="slides" id="slides">
+      <div class="slide" style="background:#3b5bdb;">Project One</div>
+      <div class="slide" style="background:#2f9e44;">Project Two</div>
+      <div class="slide" style="background:#e8590c;">Project Three</div>
+      <div class="slide" style="background:#9c36b5;">Project Four</div>
+    </div>
+
+    <button class="nav-btn prev" onclick="move(-1)">&#10094;</button>
+    <button class="nav-btn next" onclick="move(1)">&#10095;</button>
+
+    <div class="dots" id="dots"></div>
   </div>
 
-  <button class="nav-btn prev" onclick="move(-1)">&#10094;</button>
-  <button class="nav-btn next" onclick="move(1)">&#10095;</button>
-
-  <div class="dots" id="dots"></div>
+  <!-- Thumbnail lineup -->
+  <div class="thumbs" id="thumbs"></div>
 </div>
 
 <script>
   const slidesEl = document.getElementById('slides');
   const slides = document.querySelectorAll('.slide');
   const dotsEl = document.getElementById('dots');
+  const thumbsEl = document.getElementById('thumbs');
   let index = 0;
 
   slides.forEach((_, i) => {
@@ -116,9 +170,32 @@
   });
   const dots = document.querySelectorAll('.dot');
 
+  // Build the thumbnail lineup by cloning each slide's visual content
+  slides.forEach((slide, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'thumb' + (i === 0 ? ' active' : '');
+    thumb.onclick = () => goTo(i);
+
+    const img = slide.querySelector('img');
+    if (img) {
+      const thumbImg = document.createElement('img');
+      thumbImg.src = img.src;
+      thumbImg.alt = img.alt || '';
+      thumb.appendChild(thumbImg);
+    } else {
+      // fallback: color swatch + label, matches the slide's background/text
+      thumb.style.background = slide.style.background;
+      thumb.textContent = slide.textContent;
+    }
+
+    thumbsEl.appendChild(thumb);
+  });
+  const thumbs = document.querySelectorAll('.thumb');
+
   function update() {
     slidesEl.style.transform = `translateX(-${index * 100}%)`;
     dots.forEach((d, i) => d.classList.toggle('active', i === index));
+    thumbs.forEach((t, i) => t.classList.toggle('active', i === index));
   }
 
   function move(dir) {
